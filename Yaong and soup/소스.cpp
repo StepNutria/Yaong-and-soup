@@ -4,21 +4,27 @@
 #include <time.h>
 #include <string.h>
 
+
 #define ROOM_WIDTH	10 // 방 넓이
 #define HME_POS		1 // 홈 포지션
 #define BWL_PO		(ROOM_WIDTH - 2) // 냄비 위치
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
+
+void Status();
+void PrintMood();
 void RollDice();
 void RoomPrint();
-void Status();
 void Interact();
 void MakeCP();
 void Shop();
 void Addtoy(const char toyname[]);
+void RandomQuest();
+
 
 char catname[10]; // 고양이 이름
 char toylist[4][8]; // 장난감 저장
+
 
 int soupnum; // 수프 갯수
 int intimacy = 2; // 고양이 친밀도
@@ -26,13 +32,17 @@ int catpos = 1; // 고양이의 위치
 int cp; // 큐트 포인트
 int mood = 3; // 고양이 기분
 int toynumber; // 장난감 갯수
+int Spos; // 스크래처 위치
+int Tpos; // 캣 타워 위치
+int turn; // 턴 횟수
+
 
 bool rat = false;
 bool razor = false;
 bool scratcher = false;
 bool cattower = false;
 
- 
+
 int main() { // 이름 입력
 	srand((unsigned int)time(NULL));
 	printf("****야옹이와 수프****\n\n");
@@ -50,6 +60,10 @@ int main() { // 이름 입력
 		Status(); // 상태창 표시
 		
 		
+
+		PrintMood(); // 기분 나빠짐
+
+
 
 		RollDice(); // 주사위 굴리기
 
@@ -70,6 +84,10 @@ int main() { // 이름 입력
 		Shop(); // 상점 구매
 
 
+
+		RandomQuest(); // 돌발 퀘스트 발생
+
+		turn++;
 
 		Sleep(2500); system("cls");
 		}
@@ -138,6 +156,24 @@ void Status() {
 
 
 
+void PrintMood() {
+	int dice = (rand() % 6) + 1;
+	printf("6-%d: 주사위 눈이 %d 이하이면 그냥 기분이 나빠집니다.\n", intimacy, 6 - intimacy);
+	printf("주사위를 굴립니다. 또르르...\n");
+	if (dice > 6 - intimacy) {
+		printf("%d이(가) 나왔습니다.\n", dice);
+		printf("%s의 기분이 그대로입니다.\n", catname);
+	}
+	else if (dice <= 5) {
+		printf("%d이(가) 나왔습니다.\n", dice);
+		printf("%s의 기분이 나빠집니다: %d->%d\n", catname, mood, mood - 1);
+		if (mood > 0) mood--;
+	}
+	Sleep(500);
+}
+
+
+
 void RollDice() {
 	int dice = (rand() % 6) + 1;
 	int souptype = rand() % 3;
@@ -159,6 +195,19 @@ void RollDice() {
 		}
 	}
 	Sleep(500);
+
+	if (catpos == Spos) {
+		printf("%s은(는) 스크래처를 긁고 놀았습니다.\n");
+		printf("기분이 조금 좋아졌습니다: %d->%d\n");
+		if (mood < 3) mood++;
+	}
+
+	if (catpos == Tpos) {
+		printf("%s은(는) 캣타워를 뛰어다닙니다.\n");
+		printf("기분이 제법 좋아졌습니다.\n");
+		if (mood < 2) mood = mood + 2;
+	}
+
 	if (catpos == BWL_PO) {
 		switch (souptype) {
 		case 0:
@@ -188,6 +237,20 @@ void RoomPrint() {
 	for (int i = 0; i < ROOM_WIDTH - 2; i++) {
 		if (i == HME_POS - 1) {
 			printf("H");
+		}
+		else if (i == Spos - 1 && scratcher == true) {
+			Spos = (rand() % 13) + 1;
+			if (Spos == HME_POS - 1) Spos++;
+			else if (Spos == BWL_PO) Spos--;
+			else if (Spos == Tpos) Spos = Spos + ((rand() % 3) - 1);
+			printf("S");
+		}
+		else if (i == Tpos - 1 && cattower == true) {
+			Tpos = (rand() % 13) + 1;
+			if (Tpos == HME_POS - 1) Tpos++;
+			else if (Tpos == BWL_PO) Tpos--;
+			else if (Tpos == Spos) Tpos = Tpos + ((rand() % 3) - 1);
+			printf("T");
 		}
 		else if (i == BWL_PO - 1) {
 			printf("B");
@@ -406,9 +469,6 @@ void Shop() {
 	}
 	Sleep(500);
 }
-
-
-
 void Addtoy(const char toyname[]) {
 	for (int i = 0; i < 4; i++) {
 		if (toylist[i][0] == '\0') {
@@ -416,4 +476,34 @@ void Addtoy(const char toyname[]) {
 			break;
 		}
 	}
+}
+
+
+
+void RandomQuest() {
+	int RandomNumber = (rand() % 10) + 1;
+	int choose;
+	if (turn == 3) {
+		printf("!!돌발 퀘스트 발생!!\n");
+		printf("도전! 숫자 맞추기!\n");
+		printf("설명: 1~10까지의 랜덤한 숫자 중 하나를 골라 정확하게 맞춘다면 CP +2점,\n숫자와 +- 1 차이가 난다면 CP +1점,\n 숫자와 +- 2 이상 차이가 난다면 CP -1점입니다.");
+		printf("나의 숫자>> ");
+		scanf_s("%d", &choose);
+		if (RandomNumber == choose) {
+			printf("랜덤 숫자: %d\n", RandomNumber);
+			printf("정확합니다! CP +2점!\n");
+			cp = cp + 2;
+		}
+		else if (abs(RandomNumber - choose) == 1) {
+			printf("랜덤 숫자: %d\n", RandomNumber);
+			printf("+- 1 차이로 아쉽게 못맞췄네요ㅠㅠ... CP +1점!\n");
+			cp++;
+		}
+		else {
+			printf("랜덤 숫자: %d\n", RandomNumber);
+			printf("2 이상 차이가 나네요... CP -1점!\n");
+			cp--;
+		}
+	}
+	Sleep(500);
 }
