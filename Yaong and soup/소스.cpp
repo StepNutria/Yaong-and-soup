@@ -197,14 +197,14 @@ void RollDice() {
 	Sleep(500);
 
 	if (catpos == Spos) {
-		printf("%s은(는) 스크래처를 긁고 놀았습니다.\n");
-		printf("기분이 조금 좋아졌습니다: %d->%d\n");
+		printf("%s은(는) 스크래처를 긁고 놀았습니다.\n", catname);
+		printf("기분이 조금 좋아졌습니다: %d->%d\n", mood, mood + 1);
 		if (mood < 3) mood++;
 	}
 
 	if (catpos == Tpos) {
-		printf("%s은(는) 캣타워를 뛰어다닙니다.\n");
-		printf("기분이 제법 좋아졌습니다.\n");
+		printf("%s은(는) 캣타워를 뛰어다닙니다.\n", catname);
+		printf("기분이 제법 좋아졌습니다.\n", mood, mood + 2);
 		if (mood < 2) mood = mood + 2;
 	}
 
@@ -282,7 +282,7 @@ void RoomPrint() {
 void Interact() {
 	int move;
 	int dice = (rand() % 6) + 1;
-	printf("어떤 상호작용을 하시겠습니까?\n 0. 아무것도 하지 않음\n 1. 긁어 주기\ ");
+	printf("어떤 상호작용을 하시겠습니까?\n 0. 아무것도 하지 않음\n 1. 긁어 주기\n");
 	for (int i = 0; i < 4; i++) {
 		if (toylist[i][0] != '\0') {
 			printf("%d. %s로 놀아주기\n", i + 2, toylist[i]);
@@ -334,7 +334,7 @@ void Interact() {
 			break;
 		}
 		case 2: {
-			if (toylist[move - 2] != false) {
+			if (toylist[move - 2]) {
 				printf(">> ");
 				continue;
 			} 
