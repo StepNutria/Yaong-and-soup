@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-#define ROOM_WIDTH	10 // 방 넓이
+#define ROOM_WIDTH	13 // 방 넓이
 #define HME_POS		1 // 홈 포지션
 #define BWL_PO		(ROOM_WIDTH - 2) // 냄비 위치
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -14,16 +14,16 @@
 void Status();
 void PrintMood();
 void RollDice();
+void SetPos();
 void RoomPrint();
 void Interact();
 void MakeCP();
 void Shop();
-void Addtoy(const char toyname[]);
+void Addtoy(int toy);
 void RandomQuest();
 
 
 char catname[10]; // 고양이 이름
-char toylist[4][8]; // 장난감 저장
 
 
 int soupnum; // 수프 갯수
@@ -35,6 +35,8 @@ int toynumber; // 장난감 갯수
 int Spos; // 스크래처 위치
 int Tpos; // 캣 타워 위치
 int turn; // 턴 횟수
+int toyorder[2]; // 장난감 구매 순서
+int toycount; // 장난감 구매 갯수
 
 
 bool rat = false;
@@ -68,7 +70,7 @@ int main() { // 이름 입력
 		RollDice(); // 주사위 굴리기
 
 		
-
+		SetPos(); // 스크래처와 캣타워의 좌표 고정
 		RoomPrint(); // 방 출력
 
 
@@ -175,27 +177,42 @@ void PrintMood() {
 
 
 void RollDice() {
-	int dice = (rand() % 6) + 1;
 	int souptype = rand() % 3;
-	printf("%s 이동: 집사와 친밀할수록 냄비 쪽으로 갈 확률이 높아집니다.\n", catname);
-	printf("주사위 눈이 %d 이상이면 냄비 쪽으로 이동합니다.\n", (6 - intimacy));
-	printf("주사위를 굴립니다. 또르륵...\n");
-	if (dice > (6 - intimacy)) {
-		printf("%d이(가) 나왔습니다!\n", dice);
-		printf("냄비 쪽으로 움직입니다.\n");
-		if (catpos < ROOM_WIDTH - 2) {
-			catpos++;
-		}
+	int distscratcher = abs(catpos - Spos);
+	int distcattower = abs(catpos - Tpos);
+	switch (mood) {
+	case 0: {
+		printf("기분이 매우 나쁜 %s은(는) 집으로 향합니다.\n");
+		catpos++;
 	}
-	else if (dice <= (6 - intimacy)) {
-		printf("%d이(가) 나왔습니다!\n", dice);
-		printf("집 쪽으로 이동합니다.\n");
-		if (catpos > 1) {
-			catpos--;
+	case 1: {
+		if (scratcher == false && cattower == false) {
+			printf("놀 거리가 없어서 기분이 매우 나빠집니다.\n");
+			mood--;
 		}
-	}
-	Sleep(500);
+		else if (scratcher == false && cattower == true) {
+			printf("")
+		}
+		else if (scratcher == true && cattower == false) {
 
+		}
+		else if (scratcher == true && cattower == true) {
+			if (distscratcher < distcattower) {
+				catpos += (Spos > catpos) ? 1 : -1;
+			}
+			else {
+				catpos += (Tpos > catpos) ? 1 : -1;
+			}
+			}
+	}
+	case 2: {
+		printf("%s은(는) 기분좋게 식빵을 굽고 있습니다.\n");
+	}
+	case 3: {
+		printf("%s은(는) 골골송을 부르며 수프를 만들러 갑니다.\n");
+		catpos++;
+	}
+	}
 	if (catpos == Spos) {
 		printf("%s은(는) 스크래처를 긁고 놀았습니다.\n", catname);
 		printf("기분이 조금 좋아졌습니다: %d->%d\n", mood, mood + 1);
@@ -204,7 +221,7 @@ void RollDice() {
 
 	if (catpos == Tpos) {
 		printf("%s은(는) 캣타워를 뛰어다닙니다.\n", catname);
-		printf("기분이 제법 좋아졌습니다.\n", mood, mood + 2);
+		printf("기분이 제법 좋아졌습니다 %d->%d", mood, mood + 2);
 		if (mood < 2) mood = mood + 2;
 	}
 
@@ -239,17 +256,9 @@ void RoomPrint() {
 			printf("H");
 		}
 		else if (i == Spos - 1 && scratcher == true) {
-			Spos = (rand() % 13) + 1;
-			if (Spos == HME_POS - 1) Spos++;
-			else if (Spos == BWL_PO) Spos--;
-			else if (Spos == Tpos) Spos = Spos + ((rand() % 3) - 1);
 			printf("S");
 		}
 		else if (i == Tpos - 1 && cattower == true) {
-			Tpos = (rand() % 13) + 1;
-			if (Tpos == HME_POS - 1) Tpos++;
-			else if (Tpos == BWL_PO) Tpos--;
-			else if (Tpos == Spos) Tpos = Tpos + ((rand() % 3) - 1);
 			printf("T");
 		}
 		else if (i == BWL_PO - 1) {
@@ -276,6 +285,12 @@ void RoomPrint() {
 	printf("\n");
 	Sleep(500);
 }
+void SetPos() {
+	do {
+		Spos = (rand() % ROOM_WIDTH) + 1;
+		Tpos = (rand() % ROOM_WIDTH) + 1;
+	} while (Spos == Tpos || Spos == HME_POS - 1 || Spos == BWL_PO || Tpos == HME_POS - 1 || Tpos == BWL_PO);
+}
 
 
 
@@ -283,11 +298,15 @@ void Interact() {
 	int move;
 	int dice = (rand() % 6) + 1;
 	printf("어떤 상호작용을 하시겠습니까?\n 0. 아무것도 하지 않음\n 1. 긁어 주기\n");
-	for (int i = 0; i < 4; i++) {
-		if (toylist[i][0] != '\0') {
-			printf("%d. %s로 놀아주기\n", i + 2, toylist[i]);
+	for (int i = 0; i < 2; i++) {
+		if (toyorder[i] == 1) {
+			printf("%d. 장난감 쥐로 놀아 주기", i + 2);
+		}
+		else if (toyorder[i] == 2) {
+			printf("%d. 레이저 포인터로 놀아주기", i + 2);
 		}
 	}
+
 	printf(">> ");
 		while (true) {
 		scanf_s("%d", &move);
@@ -334,10 +353,32 @@ void Interact() {
 			break;
 		}
 		case 2: {
-			if (toylist[move - 2]) {
-				printf(">> ");
-				continue;
-			} 
+			if (toyorder[0] == 1) {
+				printf("장난감 쥐로 %s와 놀아 주었습니다.\n", catname);
+				printf("%s의 기분이 조금 좋아졌습니다: %d->%d\n", mood, mood + 1);
+				mood++;
+				if (dice >= 4) intimacy++;
+			}
+			else if (toyorder[0] == 2) {
+				printf("레이저 포인터로 %s와 신나게 놀아 주었습니다.\n", catname);
+				printf("%s의 기분이 꽤 좋아졌습니다: %d->%d\n", mood, mood + 2);
+				mood = mood + 2;
+				if (dice >= 2) intimacy++;
+			}
+		}
+		case 3: {
+			if (toyorder[1] == 1) {
+				printf("장난감 쥐로 %s와 놀아 주었습니다.\n", catname);
+				printf("%s의 기분이 조금 좋아졌습니다: %d->%d\n", mood, mood + 1);
+				mood++;
+				if (dice >= 4) intimacy++;
+			}
+			else if (toyorder[1] == 2) {
+				printf("레이저 포인터로 %s와 신나게 놀아 주었습니다.\n", catname);
+				printf("%s의 기분이 꽤 좋아졌습니다: %d->%d\n", mood, mood + 2);
+				mood = mood + 2;
+				if (dice >= 2) intimacy++;
+			}
 		}
 		default:
 			printf(">> ");
@@ -363,7 +404,7 @@ void MakeCP() {
 
 void Shop() {
 	int choice;
-	printf("상점에서 물건을 살 수 있습니다.\n어떤 물건을 구매할까요?");
+	printf("상점에서 물건을 살 수 있습니다.\n어떤 물건을 구매할까요?\n");
 	printf(" 0. 아무 것도 사지 않는다.\n");
 	if (!rat) {
 		printf(" 1. 장난감 쥐: 1 CP\n");
@@ -390,6 +431,7 @@ void Shop() {
 		printf(" 4. 캣 타워: 6 CP (품절)\n");
 	}
 
+	printf(">> ");
 	scanf_s("%d", &choice);
 
 	switch (choice) {
@@ -408,6 +450,7 @@ void Shop() {
 			else if (cp >= 1) {
 				cp -= 1;
 				rat = true;
+				Addtoy(1);
 				printf("장난감 쥐를 구매했습니다.\n");
 				printf("보유 cp: %d 포인트\n", cp);
 			}
@@ -425,6 +468,7 @@ void Shop() {
 			else if (cp >= 2) {
 				cp -= 2;
 				razor = true;
+				Addtoy(2);
 				printf("레이저 포인터를 구매했습니다.\n");
 				printf("보유 cp: %d 포인트\n", cp);
 			}
@@ -459,7 +503,6 @@ void Shop() {
 			else if (cp >= 6) {
 				cp -= 6;
 				cattower = true;
-				Addtoy("캣 타워");
 				printf("캣 타워를 구매했습니다.\n");
 				printf("보유 cp: %d 포인트\n", cp);
 			}
@@ -469,13 +512,10 @@ void Shop() {
 	}
 	Sleep(500);
 }
-void Addtoy(const char toyname[]) {
-	for (int i = 0; i < 4; i++) {
-		if (toylist[i][0] == '\0') {
-			strcpy_s(toylist[i], sizeof(toyname), toyname); // strcpy 안쓰면 코드가 너무 복잡해져서 사용했습니다.
-			break;
-		}
-	}
+
+void Addtoy(int toy) {
+	toyorder[toycount] = toy;
+	toycount++;
 }
 
 
