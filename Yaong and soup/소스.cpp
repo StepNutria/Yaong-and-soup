@@ -49,10 +49,10 @@ int main() { // 이름 입력
 	srand((unsigned int)time(NULL));
 	printf("****야옹이와 수프****\n\n");
 	printf("       /\\_/\\\n");
-	printf(" /\\  / o o \\\n");
+	printf(" /\\   / o o \\\n");
 	printf("//\\\\  \\~(*)~/\n");
-	printf("`   \\ /     ^ /\n");
-	printf("    | \\|| ||\n");
+	printf("`   \\ /  ^  \\\n");
+	printf("    | \\|| ||/\n");
 	printf("\n\n야옹이의 이름을 지어 주세요: ");
 	scanf_s("%s", catname, 10);
 	printf("\n야옹이의 이름은 %s입니다.", catname);
@@ -103,57 +103,51 @@ void Status() {
 	printf("현재까지 만든 수프: %d개\n", soupnum);
 	printf("CP: %d 포인트\n", cp);
 	switch (mood) {
-	case 0: {
+	case 0: 
 		printf("%s이 기분(0~3): 0\n", catname);
 		printf(" 기분이 매우 나쁩니다.\n");
 		break;
-	}
-	case 1: {
+	case 1: 
 		printf("%s이 기분(0~3): 1\n", catname);
 		printf(" 심심해합니다.\n");
 		break;
-	}
-	case 2: {
+	
+	case 2: 
 		printf("%s이 기분(0~3): 2\n", catname);
 		printf(" 식빵을 굽습니다.\n");
 		break;
-	}
-	case 3: {
+	
+	case 3: 
 		printf("%s이 기분(0~3): 3\n", catname);
 		printf(" 골골송을 부릅니다.\n");
 		break;
 	}
 
 	switch (intimacy) {
-		  case 0: {
-			  printf("집사와의 관계(0~4): 0\n");
-			  printf(" 곁에 오는 것조차 싫어합니다.\n");
-			  break;
-		  }
-		  case 1: {
-			  printf("집사와의 관계(0~4): 1\n");
-			  printf(" 간식 자판기 취급입니다.\n");
-			  break;
-		  }
-		  case 2: {
-			  printf("집사와의 관계(0~4): 2\n");
-			  printf(" 그럭저럭 쓸 만한 집사입니다.\n");
-			  break;
-		  }
-		  case 3: {
-			  printf("집사와의 관계(0~4): 3\n");
-			  printf(" 훌륭한 집사로 인정 받고 있습니다.\n");
-			  break;
-		  }
-		  case 4: {
-			  printf("집사와의 관계(0~4): 4\n");
-			  printf(" 집사 껌딱지입니다.\n");
-			  break;
-		  }
-		  }
-		  printf("===================================================\n");
-		  Sleep(500);
+	case 0:
+		printf("집사와의 관계(0~4): 0\n");
+		printf(" 곁에 오는 것조차 싫어합니다.\n");
+		break;
+	case 1:
+		printf("집사와의 관계(0~4): 1\n");
+		printf(" 간식 자판기 취급입니다.\n");
+		break;
+	case 2:
+		printf("집사와의 관계(0~4): 2\n");
+		printf(" 그럭저럭 쓸 만한 집사입니다.\n");
+		break;
+	case 3:
+		printf("집사와의 관계(0~4): 3\n");
+		printf(" 훌륭한 집사로 인정 받고 있습니다.\n");
+		break;
+	case 4:
+		printf("집사와의 관계(0~4): 4\n");
+		printf(" 집사 껌딱지입니다.\n");
+		break;
 	}
+
+	printf("===================================================\n");
+	Sleep(500);
 }
 
 
@@ -169,7 +163,7 @@ void PrintMood() {
 	else if (dice <= 5) {
 		printf("%d이(가) 나왔습니다.\n", dice);
 		printf("%s의 기분이 나빠집니다: %d->%d\n", catname, mood, mood - 1);
-		if (mood > 0) mood--;
+		if (mood > 0 && mood < 4) mood--;
 	}
 	Sleep(500);
 }
@@ -181,48 +175,50 @@ void RollDice() {
 	int distscratcher = abs(catpos - Spos);
 	int distcattower = abs(catpos - Tpos);
 	switch (mood) {
-	case 0: {
-		printf("기분이 매우 나쁜 %s은(는) 집으로 향합니다.\n");
+	case 0: 
+		printf("기분이 매우 나쁜 %s은(는) 집으로 향합니다.\n", catname);
 		catpos++;
-	}
-	case 1: {
+	case 1: 
 		if (scratcher == false && cattower == false) {
 			printf("놀 거리가 없어서 기분이 매우 나빠집니다.\n");
-			mood--;
+			if (mood > 0 && mood < 4) mood--;
 		}
 		else if (scratcher == false && cattower == true) {
-			printf("")
+			printf("%s은(는) 심심해서 캣타워 쪽으로 이동합니다.\n", catname);
+			catpos += (Tpos > catpos) ? 1 : -1;
 		}
 		else if (scratcher == true && cattower == false) {
-
+			printf("%s은(는) 심심해서 스크래처 쪽으로 이동합니다.\n", catname);
+			catpos += (Spos > catpos) ? 1 : -1;
 		}
 		else if (scratcher == true && cattower == true) {
 			if (distscratcher < distcattower) {
+				printf("%s은(는) 심심해서 스크래처 쪽으로 이동합니다.\n", catname);
 				catpos += (Spos > catpos) ? 1 : -1;
 			}
 			else {
+				printf("%s은(는) 심심해서 캣타워 쪽으로 이동합니다.\n", catname);
 				catpos += (Tpos > catpos) ? 1 : -1;
 			}
 			}
-	}
-	case 2: {
-		printf("%s은(는) 기분좋게 식빵을 굽고 있습니다.\n");
-	}
-	case 3: {
-		printf("%s은(는) 골골송을 부르며 수프를 만들러 갑니다.\n");
+	case 2: 
+		printf("%s은(는) 기분좋게 식빵을 굽고 있습니다.\n", catname);
+		break;
+	case 3: 
+		printf("%s은(는) 골골송을 부르며 수프를 만들러 갑니다.\n", catname);
 		catpos++;
-	}
+		break;
 	}
 	if (catpos == Spos) {
 		printf("%s은(는) 스크래처를 긁고 놀았습니다.\n", catname);
 		printf("기분이 조금 좋아졌습니다: %d->%d\n", mood, mood + 1);
-		if (mood < 3) mood++;
+		if (mood < 3 && mood > 0) mood++;
 	}
 
 	if (catpos == Tpos) {
 		printf("%s은(는) 캣타워를 뛰어다닙니다.\n", catname);
-		printf("기분이 제법 좋아졌습니다 %d->%d", mood, mood + 2);
-		if (mood < 2) mood = mood + 2;
+		printf("기분이 제법 좋아졌습니다 %d->%d\n", mood, mood + 2);
+		if (mood < 2 && mood > 0) mood = mood + 2;
 	}
 
 	if (catpos == BWL_PO) {
@@ -300,10 +296,10 @@ void Interact() {
 	printf("어떤 상호작용을 하시겠습니까?\n 0. 아무것도 하지 않음\n 1. 긁어 주기\n");
 	for (int i = 0; i < 2; i++) {
 		if (toyorder[i] == 1) {
-			printf("%d. 장난감 쥐로 놀아 주기", i + 2);
+			printf(" %d. 장난감 쥐로 놀아 주기\n", i + 2);
 		}
 		else if (toyorder[i] == 2) {
-			printf("%d. 레이저 포인터로 놀아주기", i + 2);
+			printf(" %d. 레이저 포인터로 놀아주기\n", i + 2);
 		}
 	}
 
@@ -311,7 +307,7 @@ void Interact() {
 		while (true) {
 		scanf_s("%d", &move);
 		switch (move) {
-		case 0: {
+		case 0: 
 			printf("아무것도 하지 않습니다.\n");
 			printf("%s의 기분이 나빠졌습니다: %d -> %d\n", catname, mood, mood - 1);
 			mood--;
@@ -331,8 +327,7 @@ void Interact() {
 				printf("현재 친밀도: %d\n", intimacy);
 			}
 			break;
-		}
-		case 1: {
+		case 1:
 			printf("%s의 턱을 긁어주었습니다.\n", catname);
 			printf("%s의 기분은 그대로입니다: %d\n", catname, mood);
 			printf("1/3의 확률로 친밀도가 높아집니다.\n");
@@ -351,35 +346,33 @@ void Interact() {
 				printf("현재 친밀도: %d\n", intimacy);
 			}
 			break;
-		}
-		case 2: {
+		case 2: 
 			if (toyorder[0] == 1) {
 				printf("장난감 쥐로 %s와 놀아 주었습니다.\n", catname);
-				printf("%s의 기분이 조금 좋아졌습니다: %d->%d\n", mood, mood + 1);
-				mood++;
+				printf("%s의 기분이 조금 좋아졌습니다: %d->%d\n", catname, mood, mood + 1);
+				if (mood > 0 && mood < 3) mood++;
 				if (dice >= 4) intimacy++;
 			}
 			else if (toyorder[0] == 2) {
 				printf("레이저 포인터로 %s와 신나게 놀아 주었습니다.\n", catname);
-				printf("%s의 기분이 꽤 좋아졌습니다: %d->%d\n", mood, mood + 2);
-				mood = mood + 2;
+				printf("%s의 기분이 꽤 좋아졌습니다: %d->%d\n", catname, mood, mood + 2);
+				if (mood > 0 && mood < 2) mood = mood + 2;
 				if (dice >= 2) intimacy++;
 			}
-		}
-		case 3: {
+			break;
+		case 3: 
 			if (toyorder[1] == 1) {
 				printf("장난감 쥐로 %s와 놀아 주었습니다.\n", catname);
-				printf("%s의 기분이 조금 좋아졌습니다: %d->%d\n", mood, mood + 1);
-				mood++;
+				printf("%s의 기분이 조금 좋아졌습니다: %d->%d\n", catname, mood, mood + 1);
+				if (mood > 0 && mood < 3) mood++;
 				if (dice >= 4) intimacy++;
 			}
 			else if (toyorder[1] == 2) {
 				printf("레이저 포인터로 %s와 신나게 놀아 주었습니다.\n", catname);
-				printf("%s의 기분이 꽤 좋아졌습니다: %d->%d\n", mood, mood + 2);
-				mood = mood + 2;
+				printf("%s의 기분이 꽤 좋아졌습니다: %d->%d\n", catname, mood, mood + 2);
+				if (mood > 0 && mood < 2) mood = mood + 2;
 				if (dice >= 2) intimacy++;
 			}
-		}
 		default:
 			printf(">> ");
 			continue;
@@ -526,7 +519,7 @@ void RandomQuest() {
 	if (turn == 3) {
 		printf("!!돌발 퀘스트 발생!!\n");
 		printf("도전! 숫자 맞추기!\n");
-		printf("설명: 1~10까지의 랜덤한 숫자 중 하나를 골라 정확하게 맞춘다면 CP +2점,\n숫자와 +- 1 차이가 난다면 CP +1점,\n 숫자와 +- 2 이상 차이가 난다면 CP -1점입니다.");
+		printf("설명: 1~10까지의 랜덤한 숫자 중 하나를 골라 정확하게 맞춘다면 CP +2점,\n숫자와 +- 1 차이가 난다면 CP +1점,\n숫자와 +- 2 이상 차이가 난다면 CP -1점입니다.\n");
 		printf("나의 숫자>> ");
 		scanf_s("%d", &choose);
 		if (RandomNumber == choose) {
